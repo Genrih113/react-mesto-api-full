@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { sendError, setOrFailError } = require('../helpers/error-handling-helpers');
+const { sendError, setOrFailError, setRejectedPromiseError } = require('../helpers/error-handling-helpers');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -55,19 +55,22 @@ const login = (req, res) => {
     .then((user) => {
       if (!user) {
         console.log('нет юзера');
-        return Promise.reject(new Error('Неправильные почта или пароль_user'));
+        setRejectedPromiseError(401, 'Неправильные почта или пароль_user')
+        //  return Promise.reject(new Error('Неправильные почта или пароль_user'));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль_matched'));
+            setRejectedPromiseError(401, 'Неправильные почта или пароль_matched')
+            //  return Promise.reject(new Error('Неправильные почта или пароль_matched'));
           }
           const token = jwt.sign({_id: user._id}, 'some-secret-key', {expiresIn: '7d'});
           res.send({token});
         })
     })
     .catch((err) => {
-      res.status(401).send({message: err.message});
+      res.status(err.status).send({message: err.message});
+      //  res.status(401).send({message: err.message});
     })
 }
 

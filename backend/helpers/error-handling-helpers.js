@@ -21,4 +21,12 @@ function setOrFailError(entityTypeAsString) {
   throw err;
 }
 
-module.exports = { sendError, setOrFailError };
+
+function setRejectedPromiseError(status, message) {
+  const err = new Error();
+  err.status = status;
+  err.message = message;
+  throw err;
+}
+
+module.exports = { sendError, setOrFailError, setRejectedPromiseError };

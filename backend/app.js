@@ -12,6 +12,7 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+
 app.use(bodyParser.json());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -20,14 +21,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-//  этот костыль авторизации больше не нужен
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '60356c6ba1361c4a1c16a794', // этот id - своего рода "авторизация"
-//   };
-
-//   next();
-// });
 
 app.post('/signin', login);
 app.post('/signup', createUser);

@@ -1,7 +1,7 @@
 const Card = require('../models/card');
-const { sendError, setOrFailError } = require('../helpers/error-handling-helpers');
+const { sendError, setCustomErrorStatusAndMessage } = require('../helpers/error-handling-helpers');
 
-const entityType = 'card';
+//const entityType = 'card';
 
 const getCards = (req, res) => {
   Card.find({})
@@ -17,27 +17,48 @@ const createCard = (req, res) => {
     .catch((err) => sendError(err, res));
 };
 
+/*
 const deleteCard = (req, res) => {
-  if (req.params.cardId == req.user._id) {
+  if (req.params.cardId === req.user._id) {
     Card.findByIdAndRemove(req.params.cardId)
-      .orFail(() => setOrFailError(entityType))
+      .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти карточку'))
       .then((card) => res.send(card))
       .catch((err) => sendError(err, res));
   } else {
-    res.status(403).send({message: 'Недостаточно прав'});
+    //res.status(403).send({message: 'Недостаточно прав'});
+    try {setCustomErrorStatusAndMessage(403, 'Недостаточно прав')}
+    catch (err) {sendError(err, res)}
   }
+};
+*/
+
+const deleteCard = (req, res) => {
+  Card.findById(req.params.cardId)
+    .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти карточку'))
+    .then((card) => {
+      console.log(`req.user._id: ${req.user._id}`);
+      console.log(`card.owner: ${card.owner}`);
+      if (JSON.stringify(req.user._id) === JSON.stringify(card.owner)) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((card) => res.send(card))
+      } else {
+        try {setCustomErrorStatusAndMessage(403, 'Недостаточно прав')}
+        catch (err) {sendError(err, res)}
+      }
+    })
+    .catch((err) => sendError(err, res));
 };
 
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .orFail(() => setOrFailError(entityType))
+    .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти карточку'))
     .then((card) => res.send(card))
     .catch((err) => sendError(err, res));
 };
 
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .orFail(() => setOrFailError(entityType))
+    .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти карточку'))
     .then((card) => res.send(card))
     .catch((err) => sendError(err, res));
 };

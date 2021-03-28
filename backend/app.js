@@ -8,6 +8,8 @@ const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { sendError } = require('./helpers/error-handling-helpers');
+const { celebrateForSign } = require('./middlewares/joi-request-schemas');
+const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 
@@ -23,8 +25,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrateForSign, login);
+app.post('/signup', celebrateForSign, createUser);
 
 app.use(auth);
 
@@ -33,6 +35,10 @@ app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
+
+
+app.use(errors()); // обработчик ошибок celebrate
+
 
 app.use((err, req, res, next) => {
   sendError(err, res);

@@ -10,6 +10,7 @@ const auth = require('./middlewares/auth');
 const { sendError } = require('./helpers/error-handling-helpers');
 const { celebrateForSign } = require('./middlewares/joi-request-schemas');
 const { errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 
@@ -25,6 +26,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 
+app.use(requestLogger); // подключаем логгер запросов
+
+
 app.post('/signin', celebrateForSign, login);
 app.post('/signup', celebrateForSign, createUser);
 
@@ -37,8 +41,9 @@ app.use('*', (req, res) => {
 });
 
 
-app.use(errors()); // обработчик ошибок celebrate
+app.use(errorLogger); // подключаем логгер ошибок
 
+app.use(errors()); // обработчик ошибок celebrate
 
 app.use((err, req, res, next) => {
   sendError(err, res);

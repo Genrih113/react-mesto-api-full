@@ -6,52 +6,52 @@ const jwt = require('jsonwebtoken');
 //const entityType = 'user';
 const userNotFoundMessage = 'Не удалось найти пользователя';
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => sendError(err, res));
+    .catch((err) => next(err));
 };
 
-const getProfile = (req, res) => {
+const getProfile = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти пользователя'))
     .then((user) => res.send(user))
-    .catch((err) => sendError(err, res));
+    .catch((err) => next(err));
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { email, password, name, about, avatar } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({ email, password: hash, name, about, avatar })
         //.orFail(() => setCustomErrorStatusAndMessage(409, 'Пользователь с таким email уже существует'))
         .then((user) => res.send(user))
-        .catch((err) => sendError(err, res));
-    })
+        .catch((err) => next(err));
+      })
     // .orFail(() => setOrFailError(entityType))
     // с этой строкой крашится при отправке некорр данных
 
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   const profileId = req.user._id;
   User.findByIdAndUpdate(profileId, { name, about }, { new: true, runValidators: true })
     .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти пользователя'))
     .then((user) => res.send(user))
-    .catch((err) => sendError(err, res));
+    .catch((err) => next(err));
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const profileId = req.user._id;
   User.findByIdAndUpdate(profileId, { avatar }, { new: true, runValidators: true })
     .orFail(() => setCustomErrorStatusAndMessage(404, 'Не удалось найти пользователя'))
     .then((user) => res.send(user))
-    .catch((err) => sendError(err, res));
+    .catch((err) => next(err));
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const {email, password } = req.body;
   User.findOne({ email }).select('+password')
     .then((user) => {
@@ -70,12 +70,12 @@ const login = (req, res) => {
           res.send({token});
         })
     })
-    .catch((err) => sendError(err, res));
+    .catch((err) => next(err));
       //res.status(err.status).send({message: err.message});
       //  res.status(401).send({message: err.message});
 }
 
-const getCurrentUser =(req, res) => {
+const getCurrentUser =(req, res, next) => {
   User.findOne({ _id: req.user })
     .then((user) => {
       if (!user) {
@@ -83,7 +83,7 @@ const getCurrentUser =(req, res) => {
       }
       res.send(user);
     })
-    .catch((err) => sendError(err, res));
+    .catch((err) => next(err));
 }
 
 module.exports = {

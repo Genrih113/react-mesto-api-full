@@ -7,6 +7,7 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { sendError } = require('./helpers/error-handling-helpers');
 
 const { PORT = 3000 } = process.env;
 
@@ -32,5 +33,9 @@ app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
+
+app.use((err, req, res, next) => {
+  sendError(err, res);
+})
 
 app.listen(PORT);

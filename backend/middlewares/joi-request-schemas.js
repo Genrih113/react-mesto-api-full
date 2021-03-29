@@ -7,7 +7,7 @@ const celebrateForSign = celebrate({
   }).unknown(true)
 })
 
-//  вроде можно обойтись одной ф-ей и на регистрацию и на вход
+// вроде можно обойтись одной ф-ей и на регистрацию и на вход
 // const celebrateForSignin = celebrate({
 //   body: Joi.object().keys({
 //     email: Joi.string().required().email(),

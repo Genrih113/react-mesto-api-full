@@ -14,7 +14,6 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    console.log('authorization');
     return handleAuthError(res);
   }
 
@@ -24,11 +23,9 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    console.log('try-catch');
     return handleAuthError(res);
   }
 
   req.user = payload;
-  console.log(req.user);
   next();
 }

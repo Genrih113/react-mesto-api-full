@@ -66,7 +66,8 @@ class SignApi {
 
 
 const signApi = new SignApi({
-  baseUrl: 'https://auth.nomoreparties.co',
+  //  baseUrl: 'https://auth.nomoreparties.co',
+  baseUrl: 'http://localhost:3001'
 });
 
 export default signApi;

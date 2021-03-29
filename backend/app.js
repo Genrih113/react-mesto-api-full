@@ -2,6 +2,7 @@ const express = require('express');
 //  const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
@@ -12,10 +13,11 @@ const { celebrateForSign } = require('./middlewares/joi-request-schemas');
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 
 const app = express();
 
+app.use(cors());
 
 app.use(bodyParser.json());
 

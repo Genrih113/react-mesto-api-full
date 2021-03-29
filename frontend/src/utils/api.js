@@ -95,7 +95,7 @@ class Api {
 
   likeToggleCard(doILikedCard, imageId) {
     if (!doILikedCard) {
-      return fetch(this._baseUrl + '/cards/likes/' + imageId, {
+      return fetch(this._baseUrl + '/cards/'+ imageId + '/likes/', {
         method: 'PUT',
         headers: {
           authorization: this._token,
@@ -110,7 +110,7 @@ class Api {
         }
       })
     } else {
-      return fetch(this._baseUrl + '/cards/likes/' + imageId, {
+      return fetch(this._baseUrl + '/cards/'+ imageId + '/likes/', {
         method: 'DELETE',
         headers: {
           authorization: this._token,
@@ -149,8 +149,10 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
-  token: '7d3b332b-dc1e-49e3-90aa-8e33833ea304'
+  //  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
+  baseUrl: 'http://localhost:3001',
+  token: `Bearer ${localStorage.getItem('token')}`
+  //  token: '7d3b332b-dc1e-49e3-90aa-8e33833ea304'
 });
 
 export default api;

@@ -122,7 +122,7 @@ function App() {
 
   function handleCardLike(card) {
     // Проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some(like => like._id === currentUser._id);
+    const isLiked = card.likes.some(like => like === currentUser._id);
 
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api.likeToggleCard(isLiked, card._id)
@@ -185,8 +185,8 @@ function App() {
     if (Boolean(localStorage.getItem('token'))) {
       signApi.checkToken(localStorage.getItem('token'))
       .then((result) => {
-        if (result.data.email) {
-          memorizeUserEmail(result.data.email);
+        if (result.email) {
+          memorizeUserEmail(result.email);
           logIn();
           history.push('/');
         }

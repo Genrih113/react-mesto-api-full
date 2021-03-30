@@ -66,8 +66,9 @@ class SignApi {
 
 
 const signApi = new SignApi({
+  baseUrl: `${window.location.protocol}${process.env.REACT_APP_API_URL || '//localhost:3001'}`,
   //  baseUrl: 'https://auth.nomoreparties.co',
-  baseUrl: 'http://api.genrih113-mesto.nomoredomains.club'
+  //  baseUrl: 'http://api.genrih113-mesto.nomoredomains.club'
 });
 
 export default signApi;

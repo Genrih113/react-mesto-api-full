@@ -149,9 +149,10 @@ class Api {
 }
 
 const api = new Api({
-  //  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
-  baseUrl: 'http://api.genrih113-mesto.nomoredomains.club',
+  baseUrl: `${window.location.protocol}${process.env.REACT_APP_API_URL || '//localhost:3001'}`,
   token: `Bearer ${localStorage.getItem('token')}`
+  //  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
+  //  baseUrl: 'http://api.genrih113-mesto.nomoredomains.club',
   //  token: '7d3b332b-dc1e-49e3-90aa-8e33833ea304'
 });
 

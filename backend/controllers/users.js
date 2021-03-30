@@ -3,9 +3,12 @@ const { setCustomErrorStatusAndMessage } = require('../helpers/error-handling-he
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const userNotFoundMessage = 'Не удалось найти пользователя';
 const incorrectEmailOrPasswordMessage = 'Неправильные почта или пароль';
-const tokenSignatureKey = 'some-secret-key';
+//const tokenSignatureKey = 'some-secret-key';
+const tokenSignatureKey = (NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
 
 const getUsers = (req, res, next) => {
   User.find({})

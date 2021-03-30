@@ -32,6 +32,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(requestLogger); // подключаем логгер запросов
 
+//  эта директива для проверки восстановления сервера с помощью pm2
+//  удалить после сдачи 15й работы
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/signin', celebrateForSign, login);
 app.post('/signup', celebrateForSign, createUser);

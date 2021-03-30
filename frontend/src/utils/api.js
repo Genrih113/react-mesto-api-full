@@ -150,7 +150,7 @@ class Api {
 
 const api = new Api({
   //  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
-  baseUrl: 'http://localhost:3001',
+  baseUrl: 'http://genrih113-mesto.nomoredomains.club:3001',
   token: `Bearer ${localStorage.getItem('token')}`
   //  token: '7d3b332b-dc1e-49e3-90aa-8e33833ea304'
 });

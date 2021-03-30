@@ -67,7 +67,7 @@ class SignApi {
 
 const signApi = new SignApi({
   //  baseUrl: 'https://auth.nomoreparties.co',
-  baseUrl: 'http://localhost:3001'
+  baseUrl: 'http://genrih113-mesto.nomoredomains.club:3001'
 });
 
 export default signApi;

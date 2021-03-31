@@ -69,7 +69,11 @@ const login = (req, res, next) => {
             setCustomErrorStatusAndMessage(401, incorrectEmailOrPasswordMessage);
           }
           const token = jwt.sign({ _id: user._id }, tokenSignatureKey, { expiresIn: '7d' });
-          res.send({ token });
+
+          const userWithToken = { user };
+          userWithToken.token = token;
+
+          res.send({ userWithToken });
         });
     })
     .catch((err) => next(err));

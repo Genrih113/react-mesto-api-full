@@ -2,10 +2,10 @@ const router = require('express').Router();
 const {
   getUsers,
   getProfile,
-  //createUser,
+  // createUser,
   updateProfile,
   updateAvatar,
-  getCurrentUser
+  getCurrentUser,
 } = require('../controllers/users');
 const { celebrateForUpdateProfile, celebrateForUpdateAvatar } = require('../middlewares/joi-request-schemas');
 

@@ -28,7 +28,8 @@ const createUser = (req, res, next) => {
   bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({ email, password: hash, name, about, avatar })
-        .then((user) => res.send(user))
+        //  .then((user) => res.send(user)) //  тут незачем возвращать пользователя (1рев.)
+        .then(() => res.send({message: 'пользователь создан'}))
         .catch((err) => next(err));
       })
 };

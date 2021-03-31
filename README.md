@@ -1,7 +1,8 @@
 # Проектная работа 15 react-mesto-api-full
 Соединены фронт и бэк.
 Проект доступен по адресу:
-https://genrih113-mesto.nomoredomains.club
+фронтенд- https://genrih113-mesto.nomoredomains.club
+бэкенд- https://api.genrih113-mesto.nomoredomains.club
 Публичный IPv4- 84.201.152.191
 
 

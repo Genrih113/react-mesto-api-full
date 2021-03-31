@@ -3,14 +3,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { errors } = require('celebrate');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { sendError } = require('./helpers/error-handling-helpers');
-const { celebrateForSign } = require('./middlewares/joi-request-schemas');
-const { errors } = require('celebrate');
+const { setCustomErrorStatusAndMessage, sendError } = require('./helpers/error-handling-helpers');
+const { celebrateForSignin, celebrateForSignup } = require('./middlewares/joi-request-schemas');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3001 } = process.env;
@@ -36,19 +36,21 @@ app.use(requestLogger); // подключаем логгер запросов
 //  удалить после сдачи 15й работы
 app.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
+    const err = new Error();
+    err.message = 'Ой-ой доска кончается- сейчас я упаду';
+    throw err;
   }, 0);
 });
 
-app.post('/signin', celebrateForSign, login);
-app.post('/signup', celebrateForSign, createUser);
+app.post('/signin', celebrateForSignin, login);
+app.post('/signup', celebrateForSignup, createUser);
 
 app.use(auth);
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+  setCustomErrorStatusAndMessage(404, 'Запрашиваемый ресурс не найден')
 });
 
 

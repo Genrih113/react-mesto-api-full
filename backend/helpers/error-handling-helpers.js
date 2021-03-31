@@ -1,14 +1,14 @@
 function sendError(err, res) {
   if (err.name === 'ValidationError') {
-    res.status(400).send({ message: 'Введены не корректные данные', err }); //  если ошибка при валидации
+    res.status(400).send({ message: 'Введены не корректные данные' }); //  если ошибка при валидации
   } else if (err.kind === 'ObjectId') {
-    res.status(400).send({ message: 'Введен не корректный идентификатор', err }); //  если ош из-за невер id (н-р: короткий)
+    res.status(400).send({ message: 'Введен не корректный идентификатор' }); //  если ош из-за невер id (н-р: короткий)
   } else if (err.code === 11000) {
-    res.status(409).send({ message: 'Пользователь с таким email уже существует', err }); //  когда соз-ся польз-ль, но такой уже есть
+    res.status(409).send({ message: 'Пользователь с таким email уже существует' }); //  когда соз-ся польз-ль, но такой уже есть
   } else if (err.custom === true) {
     res.status(err.status).send({ message: err.message }); //  если id корректный но такого id нет
   } else {
-    res.status(500).send(err); //  если еще какая напасть
+    res.status(500).send(err.message); //  если еще какая напасть
   }
 }
 

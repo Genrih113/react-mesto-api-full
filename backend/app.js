@@ -15,8 +15,6 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3001 } = process.env;
 
-console.log(process.env.NODE_ENV);
-
 const app = express();
 
 app.use(cors());
@@ -28,7 +26,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
 });
-
 
 app.use(requestLogger); // подключаем логгер запросов
 
@@ -49,17 +46,16 @@ app.use(auth);
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use('*', (req, res) => {
-  setCustomErrorStatusAndMessage(404, 'Запрашиваемый ресурс не найден')
+app.use('*', () => {
+  setCustomErrorStatusAndMessage(404, 'Запрашиваемый ресурс не найден');
 });
-
 
 app.use(errorLogger); // подключаем логгер ошибок
 
 app.use(errors()); // обработчик ошибок celebrate
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   sendError(err, res);
-})
+});
 
 app.listen(PORT);

@@ -8,14 +8,14 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => isEmail(v),
-      message: 'Неверный формат почты'
-    }
+      message: 'Неверный формат почты',
+    },
   },
   password: {
     type: String,
     required: true,
     minLength: 4,
-    select: false
+    select: false,
   },
 
   name: {

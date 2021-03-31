@@ -24,10 +24,13 @@ const deleteCard = (req, res, next) => {
     .then((card) => {
       if (JSON.stringify(req.user._id) === JSON.stringify(card.owner)) {
         Card.findByIdAndRemove(req.params.cardId)
-          .then((card) => res.send(card))
+          .then((cardThatWasFinded) => res.send(cardThatWasFinded));
       } else {
-        try {setCustomErrorStatusAndMessage(403, permissionDenied)}
-        catch (err) {next(err)}
+        try {
+          setCustomErrorStatusAndMessage(403, permissionDenied);
+        } catch (err) {
+          next(err);
+        }
       }
     })
     .catch((err) => next(err));

@@ -62,10 +62,20 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({
     about: "",
     avatar: "",
-    cohort: "",
+    email: "",
     name: "",
-    _id: "75afb32823f9c1dc44155bd8"
+    _id: "",
   });
+
+  function resetCurrentUser() {
+    setCurrentUser({
+      about: "",
+      avatar: "",
+      email: "",
+      name: "",
+      _id: "",
+    });
+  };
 
   function handleUpdateUser(obj) {
     api.editUserInfo(obj)
@@ -86,13 +96,7 @@ function App() {
     .finally(closeAllPopups())
   }
 
-  React.useEffect(() => {
-    api.getUserInfo()
-    .then((result) => {
-      setCurrentUser(result);
-    })
-    .catch(err => console.log(err))
-  }, []);
+
 
 
   //стейт выбранной карточки и хендлы открытия попапов просмотра фотографии и подтверждения удаления
@@ -112,13 +116,7 @@ function App() {
   //стейт, эффект и хендлы работы с массивом карточек мест
   const [cards, setCards] = React.useState([]);
 
-  React.useEffect(() => {
-    api.getInitialCards()
-    .then((result) => {
-      setCards(result);
-    })
-    .catch(err => console.log(err))
-  }, []);
+
 
   function handleCardLike(card) {
     // Проверяем, есть ли уже лайк на этой карточке
@@ -172,12 +170,13 @@ function App() {
   function logOut() {
     setLoggedIn(false);
     localStorage.removeItem('token');
+    resetCurrentUser();
   }
 
-  const [userEmail, setUserEmail] = React.useState('');
-  function memorizeUserEmail(email) {
-    setUserEmail(email);
-  }
+  // const [userEmail, setUserEmail] = React.useState('');
+  // function memorizeUserEmail(email) {
+  //   setUserEmail(email);
+  // }
 
   const history = useHistory();
 
@@ -186,7 +185,8 @@ function App() {
       signApi.checkToken(localStorage.getItem('token'))
       .then((result) => {
         if (result.email) {
-          memorizeUserEmail(result.email);
+          //memorizeUserEmail(result.email);
+          setCurrentUser(result);
           logIn();
           history.push('/');
         }
@@ -198,8 +198,9 @@ function App() {
   function signIn(password, email) {
     signApi.signin(password, email)
     .then((res) => {
-      localStorage.setItem('token', (res.token));//JSON.stringify(res.token));
-      memorizeUserEmail(email);
+      localStorage.setItem('token', (res.userWithToken.token));//JSON.stringify(res.token));
+      setCurrentUser(res.userWithToken.user);
+      //memorizeUserEmail(email);
       logIn();
       history.push('/');
     })
@@ -246,6 +247,30 @@ function App() {
 
 
 
+  React.useEffect(() => {
+    if (!loggedIn) {
+      return
+    }
+    api.getUserInfo(localStorage.getItem('token'))
+    .then((result) => {
+      setCurrentUser(result);
+    })
+    .catch(err => console.log(err))
+  }, [loggedIn]);
+
+
+  React.useEffect(() => {
+    if (!loggedIn) {
+      return
+    }
+    api.getInitialCards(localStorage.getItem('token'))
+    .then((result) => {
+      setCards(result);
+    })
+    .catch(err => console.log(err))
+  }, [loggedIn]);
+
+
   return (
     <CurrentUserContext.Provider value = {currentUser}>
       <div className="body">
@@ -253,7 +278,7 @@ function App() {
 
           <Header
             headerLink = {headerLink}
-            userEmail = {userEmail}
+            userEmail = {currentUser.email}
             loggedIn = {loggedIn}
             logOut = {logOut}
           />

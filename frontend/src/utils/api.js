@@ -4,10 +4,11 @@ class Api {
     this._token = token;
   }
 
-  getUserInfo() {
+  getUserInfo(JWT) {
     return fetch(this._baseUrl + '/users/me', {
       headers: {
-        authorization: this._token
+        // authorization: this._token
+        authorization: `Bearer ${JWT}`
       }
     })
     .then((res) => {
@@ -19,10 +20,11 @@ class Api {
     })
   }
 
-  getInitialCards() {
+  getInitialCards(JWT) {
     return fetch(this._baseUrl + '/cards', {
       headers: {
-        authorization: this._token
+        //authorization: this._token
+        authorization: `Bearer ${JWT}`
       }
     })
     .then((res) => {

@@ -1,7 +1,7 @@
 class Api {
   constructor({baseUrl, token}) {
     this._baseUrl = baseUrl;
-    this._token = token;
+    // this._token = token;
   }
 
   getUserInfo(JWT) {
@@ -36,11 +36,11 @@ class Api {
     })
   }
 
-  editUserInfo(userInfoObj) {
+  editUserInfo(JWT, userInfoObj) {
     return fetch(this._baseUrl + '/users/me', {
       method: 'PATCH',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${JWT}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -57,11 +57,11 @@ class Api {
     })
   }
 
-  addNewCard(inputsInfoObject) {
+  addNewCard(JWT, inputsInfoObject) {
     return fetch(this._baseUrl + '/cards', {
       method: 'POST',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${JWT}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -78,11 +78,11 @@ class Api {
     })
   }
 
-  deleteCard(cardId) {
+  deleteCard(JWT, cardId) {
     return fetch(this._baseUrl + '/cards/' + cardId, {
       method: 'DELETE',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${JWT}`,
         'Content-Type': 'application/json'
       }
     })
@@ -95,12 +95,12 @@ class Api {
     })
   }
 
-  likeToggleCard(doILikedCard, imageId) {
+  likeToggleCard(JWT, doILikedCard, imageId) {
     if (!doILikedCard) {
       return fetch(this._baseUrl + '/cards/'+ imageId + '/likes/', {
         method: 'PUT',
         headers: {
-          authorization: this._token,
+          authorization: `Bearer ${JWT}`,
           'Content-Type': 'application/json'
         }
       })
@@ -115,7 +115,7 @@ class Api {
       return fetch(this._baseUrl + '/cards/'+ imageId + '/likes/', {
         method: 'DELETE',
         headers: {
-          authorization: this._token,
+          authorization: `Bearer ${JWT}`,
           'Content-Type': 'application/json'
         }
       })
@@ -129,11 +129,11 @@ class Api {
     }
   }
 
-  changeAvatar(url) {
+  changeAvatar(JWT, url) {
     return fetch(this._baseUrl + '/users/me/avatar', {
       method: 'PATCH',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${JWT}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -152,7 +152,7 @@ class Api {
 
 const api = new Api({
   baseUrl: `${window.location.protocol}${process.env.REACT_APP_API_URL || '//localhost:3001'}`,
-  token: `Bearer ${localStorage.getItem('token')}`
+  // token: `Bearer ${localStorage.getItem('token')}`
   //  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
   //  baseUrl: 'http://api.genrih113-mesto.nomoredomains.club',
   //  token: '7d3b332b-dc1e-49e3-90aa-8e33833ea304'

@@ -70,10 +70,11 @@ const login = (req, res, next) => {
           }
           const token = jwt.sign({ _id: user._id }, tokenSignatureKey, { expiresIn: '7d' });
 
-          const userWithToken = { user };
-          userWithToken.token = token;
+          // const userWithToken = { user };
+          // userWithToken.token = token;
+          // res.send({ userWithToken });
 
-          res.send({ userWithToken });
+          res.send({ token });
         });
     })
     .catch((err) => next(err));

@@ -78,7 +78,7 @@ function App() {
   };
 
   function handleUpdateUser(obj) {
-    api.editUserInfo(obj)
+    api.editUserInfo(localStorage.getItem('token'), obj)
     .then((result) => {
       setCurrentUser(result);
       closeAllPopups();
@@ -88,7 +88,7 @@ function App() {
   }
 
   function handleUpdateAvatar(url) {
-    api.changeAvatar(url)
+    api.changeAvatar(localStorage.getItem('token'), url)
     .then((result) => {
       setCurrentUser(result);
     })
@@ -123,7 +123,7 @@ function App() {
     const isLiked = card.likes.some(like => like === currentUser._id);
 
     // Отправляем запрос в API и получаем обновлённые данные карточки
-    api.likeToggleCard(isLiked, card._id)
+    api.likeToggleCard(localStorage.getItem('token'), isLiked, card._id)
     .then((newCard) => {
         // Формируем новый массив на основе имеющегося, подставляя в него новую карточку
       const newCards = cards.map((c) => c._id === card._id ? newCard : c);
@@ -135,7 +135,7 @@ function App() {
 
   //хендл удаления карточки запускается из попапа подтверждения
   function handleCardDelete(card) {
-    api.deleteCard(card._id)
+    api.deleteCard(localStorage.getItem('token'), card._id)
     .then((result) => {
       const newCards = cards.filter((c) => {return (c._id !== card._id)});
       setCards(newCards);
@@ -145,7 +145,7 @@ function App() {
   }
 
   function handleAddPlaceSubmit(newPlaceObj) {
-    api.addNewCard(newPlaceObj)
+    api.addNewCard(localStorage.getItem('token'), newPlaceObj)
     .then((result) => {
       setCards([result, ...cards]);
     })
@@ -198,9 +198,10 @@ function App() {
   function signIn(password, email) {
     signApi.signin(password, email)
     .then((res) => {
-      localStorage.setItem('token', (res.userWithToken.token));//JSON.stringify(res.token));
-      setCurrentUser(res.userWithToken.user);
-      //memorizeUserEmail(email);
+      // localStorage.setItem('token', (res.userWithToken.token));//JSON.stringify(res.token));
+      localStorage.setItem('token', (res.token));
+      // setCurrentUser(res.userWithToken.user);
+      // memorizeUserEmail(email);
       logIn();
       history.push('/');
     })

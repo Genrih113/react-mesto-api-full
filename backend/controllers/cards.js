@@ -43,7 +43,8 @@ const deleteCard = (req, res, next) => {
 const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.id, { $addToSet: { likes: req.user._id } }, { new: true })
     .orFail(() => { throw new NotFoundError(cardNotFoundMessage); })
-    .then(() => res.send({ message: 'лайк поставлен' }))
+    // .then(() => res.send({ message: 'лайк поставлен' }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         next(new BadRequestError(incorrectIdMessage));
@@ -55,7 +56,8 @@ const likeCard = (req, res, next) => {
 const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.id, { $pull: { likes: req.user._id } }, { new: true })
     .orFail(() => { throw new NotFoundError(cardNotFoundMessage); })
-    .then(() => res.send({ message: 'лайк снят' }))
+    // .then(() => res.send({ message: 'лайк снят' }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         next(new BadRequestError(incorrectIdMessage));

@@ -55,27 +55,11 @@ app.use('*', () => {
 
 app.use(errorLogger); // подключаем логгер ошибок
 
-// app.use(errors()); // обработчик ошибок celebrate
-
-// app.use((err, req, res, next) => {
-//   if (isCelebrateError(err)) {
-//     console.log(err.details);
-//     let errorBody;
-//     if (err.details.get('body')) {
-//       errorBody = err.details.get('body');
-//     } else if (err.details.get('params')) {
-//       errorBody = err.details.get('params');
-//     }
-//     console.log(errorBody);
-//     return res.send({ message: errorBody.message });
-//   }
-//   return next(err);
-// });
-
 app.use(celebrateErrorsHandler);
 
 app.use((err, req, res, next) => {
   res.status(err.statusCode).send({ message: err.message });
+  next();
 });
 
 app.listen(PORT);

@@ -146,8 +146,8 @@ const celebrateForIdCheck = celebrate({
         .hex()
         .length(24)
         .messages({
-          'string.hex': 'id должно состоять из hex-символов',
-          'string.length': 'id должно состоять из 24 символов',
+          'string.hex': 'id должно состоять из 24 hex-символов',
+          'string.length': 'id должно состоять из 24 hex-символов',
         }),
   }).unknown(true),
 });

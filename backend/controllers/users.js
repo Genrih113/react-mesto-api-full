@@ -2,12 +2,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
-const { setCustomErrorStatusAndMessage } = require('../helpers/error-handling-helpers');
+const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
+const BadRequestError = require('../errors/bad-request-error');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const userNotFoundMessage = 'Не удалось найти пользователя';
 const incorrectEmailOrPasswordMessage = 'Неправильные почта или пароль';
+const mailHasAlreadyBeenUsed = 'Пользователь с такой почтой уже существует';
+const incorrectIdMessage = 'Введен не корректный идентификатор';
 const tokenSignatureKey = (NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
 
 const getUsers = (req, res, next) => {
@@ -17,10 +21,15 @@ const getUsers = (req, res, next) => {
 };
 
 const getProfile = (req, res, next) => {
-  User.findById(req.params.userId)
-    .orFail(() => setCustomErrorStatusAndMessage(404, userNotFoundMessage))
+  User.findById(req.params.id)
+    .orFail(() => { throw new NotFoundError(userNotFoundMessage); })
     .then((user) => res.send(user))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        next(new BadRequestError(incorrectIdMessage));
+      }
+      next(err);
+    });
 };
 
 const createUser = (req, res, next) => {
@@ -32,9 +41,13 @@ const createUser = (req, res, next) => {
       User.create({
         email, password: hash, name, about, avatar,
       })
-        //  .then((user) => res.send(user)) //  тут незачем возвращать пользователя (1рев.)
         .then(() => res.send({ message: 'пользователь создан' }))
-        .catch((err) => next(err));
+        .catch((err) => {
+          if (err.code === 11000) {
+            return next(new ConflictError(mailHasAlreadyBeenUsed));
+          }
+          return next(err);
+        });
     });
 };
 
@@ -42,7 +55,7 @@ const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   const profileId = req.user._id;
   User.findByIdAndUpdate(profileId, { name, about }, { new: true, runValidators: true })
-    .orFail(() => setCustomErrorStatusAndMessage(404, userNotFoundMessage))
+    .orFail(() => { throw new NotFoundError(userNotFoundMessage); })
     .then((user) => res.send(user))
     .catch((err) => next(err));
 };
@@ -51,7 +64,7 @@ const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const profileId = req.user._id;
   User.findByIdAndUpdate(profileId, { avatar }, { new: true, runValidators: true })
-    .orFail(() => setCustomErrorStatusAndMessage(404, userNotFoundMessage))
+    .orFail(() => { throw new NotFoundError(userNotFoundMessage); })
     .then((user) => res.send(user))
     .catch((err) => next(err));
 };
@@ -61,19 +74,14 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        setCustomErrorStatusAndMessage(401, incorrectEmailOrPasswordMessage);
+        throw new NotFoundError(incorrectEmailOrPasswordMessage);
       }
-      return bcrypt.compare(password, user.password)
+      bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            setCustomErrorStatusAndMessage(401, incorrectEmailOrPasswordMessage);
+            throw new NotFoundError(incorrectEmailOrPasswordMessage);
           }
           const token = jwt.sign({ _id: user._id }, tokenSignatureKey, { expiresIn: '7d' });
-
-          // const userWithToken = { user };
-          // userWithToken.token = token;
-          // res.send({ userWithToken });
-
           res.send({ token });
         });
     })
@@ -84,7 +92,7 @@ const getCurrentUser = (req, res, next) => {
   User.findOne({ _id: req.user })
     .then((user) => {
       if (!user) {
-        setCustomErrorStatusAndMessage(404, userNotFoundMessage);
+        throw new NotFoundError(userNotFoundMessage);
       }
       res.send(user);
     })

@@ -3,15 +3,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { errors } = require('celebrate');
+// const { errors, isCelebrateError } = require('celebrate');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { setCustomErrorStatusAndMessage, sendError } = require('./helpers/error-handling-helpers');
+const celebrateErrorsHandler = require('./middlewares/celebrate-errors-handler');
+// const { setCustomErrorStatusAndMessage, sendError } = require('./helpers/error-handling-helpers')
 const { celebrateForSignin, celebrateForSignup } = require('./middlewares/joi-request-schemas');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const NotFoundError = require('./errors/not-found-error');
 
 const { PORT = 3001 } = process.env;
 
@@ -47,15 +49,33 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('*', () => {
-  setCustomErrorStatusAndMessage(404, 'Запрашиваемый ресурс не найден');
+  // setCustomErrorStatusAndMessage(404, 'Запрашиваемый ресурс не найден');
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
 app.use(errorLogger); // подключаем логгер ошибок
 
-app.use(errors()); // обработчик ошибок celebrate
+// app.use(errors()); // обработчик ошибок celebrate
 
-app.use((err, req, res) => {
-  sendError(err, res);
+// app.use((err, req, res, next) => {
+//   if (isCelebrateError(err)) {
+//     console.log(err.details);
+//     let errorBody;
+//     if (err.details.get('body')) {
+//       errorBody = err.details.get('body');
+//     } else if (err.details.get('params')) {
+//       errorBody = err.details.get('params');
+//     }
+//     console.log(errorBody);
+//     return res.send({ message: errorBody.message });
+//   }
+//   return next(err);
+// });
+
+app.use(celebrateErrorsHandler);
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
 });
 
 app.listen(PORT);

@@ -1,8 +1,11 @@
 const Card = require('../models/card');
-const { setCustomErrorStatusAndMessage } = require('../helpers/error-handling-helpers');
+const NotFoundError = require('../errors/not-found-error');
+const ForbiddenError = require('../errors/forbidden-error');
+const BadRequestError = require('../errors/bad-request-error');
 
 const cardNotFoundMessage = 'Не удалось найти карточку';
 const permissionDenied = 'Недостаточно прав';
+const incorrectIdMessage = 'Введен не корректный идентификатор';
 
 const getCards = (req, res, next) => {
   Card.find({})
@@ -19,35 +22,46 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
-    .orFail(() => setCustomErrorStatusAndMessage(404, cardNotFoundMessage))
+  Card.findById(req.params.id)
+    .orFail(() => { throw new NotFoundError(cardNotFoundMessage); })
     .then((card) => {
       if (JSON.stringify(req.user._id) === JSON.stringify(card.owner)) {
-        Card.findByIdAndRemove(req.params.cardId)
-          .then((cardThatWasFinded) => res.send(cardThatWasFinded));
+        Card.findByIdAndRemove(req.params.id)
+          .then(() => res.send({ message: 'карточка удалена' }));
       } else {
-        try {
-          setCustomErrorStatusAndMessage(403, permissionDenied);
-        } catch (err) {
-          next(err);
-        }
+        throw new ForbiddenError(permissionDenied);
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        next(new BadRequestError(incorrectIdMessage));
+      }
+      next(err);
+    });
 };
 
 const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .orFail(() => setCustomErrorStatusAndMessage(404, cardNotFoundMessage))
-    .then((card) => res.send(card))
-    .catch((err) => next(err));
+  Card.findByIdAndUpdate(req.params.id, { $addToSet: { likes: req.user._id } }, { new: true })
+    .orFail(() => { throw new NotFoundError(cardNotFoundMessage); })
+    .then(() => res.send({ message: 'лайк поставлен' }))
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        next(new BadRequestError(incorrectIdMessage));
+      }
+      next(err);
+    });
 };
 
 const dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .orFail(() => setCustomErrorStatusAndMessage(404, cardNotFoundMessage))
-    .then((card) => res.send(card))
-    .catch((err) => next(err));
+  Card.findByIdAndUpdate(req.params.id, { $pull: { likes: req.user._id } }, { new: true })
+    .orFail(() => { throw new NotFoundError(cardNotFoundMessage); })
+    .then(() => res.send({ message: 'лайк снят' }))
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        next(new BadRequestError(incorrectIdMessage));
+      }
+      next(err);
+    });
 };
 
 module.exports = {

@@ -7,11 +7,15 @@ const {
   updateAvatar,
   getCurrentUser,
 } = require('../controllers/users');
-const { celebrateForUpdateProfile, celebrateForUpdateAvatar } = require('../middlewares/joi-request-schemas');
+const {
+  celebrateForUpdateProfile,
+  celebrateForUpdateAvatar,
+  celebrateForIdCheck,
+} = require('../middlewares/joi-request-schemas');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
-router.get('/:userId', getProfile);
+router.get('/:id', celebrateForIdCheck, getProfile);
 //  router.post('/', createUser); //  этот роут заменен подобным в app.js
 router.patch('/me', celebrateForUpdateProfile, updateProfile); //  обновляет профиль
 router.patch('/me/avatar', celebrateForUpdateAvatar, updateAvatar); //  обновляет аватар

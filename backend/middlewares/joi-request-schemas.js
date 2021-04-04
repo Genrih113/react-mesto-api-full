@@ -101,7 +101,7 @@ const celebrateForUpdateAvatar = celebrate({
     avatar:
       Joi
         .string()
-        // .required()
+        .required()
         .regex(/^https?:\/\/[a-zA-Z0-9\-]{2,64}\.[a-zA-Z0-9\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]{2,}/)
         .message('не корректный адрес ссылки на аватарку'),
     // .messages({
@@ -128,7 +128,7 @@ const celebrateForCreateCard = celebrate({
     link:
       Joi
         .string()
-        // .required()
+        .required()
         .regex(/^https?:\/\/[a-zA-Z0-9\-]{2,64}\.[a-zA-Z0-9\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=]{2,}/)
         .message('не корректный адрес ссылки на картинку'),
     // .messages({
